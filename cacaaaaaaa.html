@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Semangat, Caca!</title>
+  <style>
+    :root{
+      --bg1:#ffecd2;
+      --bg2:#fcb69f;
+      --accent:#7c3aed;
+      --muted:#4b5563;
+    }
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
+    body{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:radial-gradient(60% 60% at 10% 10%, rgba(255,255,255,0.6), transparent),
+                 linear-gradient(135deg,var(--bg1), var(--bg2));
+      color:var(--muted);
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+    .card{
+      width:min(720px,92vw);
+      background:rgba(255,255,255,0.9);
+      border-radius:20px;
+      box-shadow:0 10px 40px rgba(16,24,40,0.12);
+      padding:48px;
+      text-align:center;
+      position:relative;
+      overflow:visible;
+    }
+    h1{
+      margin:0 0 8px;
+      font-size:28px;
+      color:var(--accent);
+      letter-spacing:0.2px;
+    }
+    p.lead{
+      margin:0 0 26px;
+      color:#6b7280;
+    }
+    .btn{
+      --sz:120px;
+      display:inline-grid;
+      place-items:center;
+      width:var(--sz);
+      height:var(--sz);
+      border-radius:999px;
+      background:linear-gradient(180deg,#7c3aed,#5b21b6);
+      color:white;
+      font-weight:700;
+      font-size:18px;
+      border:0;
+      cursor:pointer;
+      box-shadow:0 12px 30px rgba(124,58,237,0.28), inset 0 -6px 18px rgba(0,0,0,0.08);
+      transition:transform .18s ease, box-shadow .18s ease;
+    }
+    .btn:active{ transform:scale(.96) rotate(-1deg); }
+    .subtitle{
+      margin-top:16px;color:#374151;font-size:14px;
+    }
+
+    /* popup message (toast-like) */
+    .message-belt{
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
+      top:-18px;
+      pointer-events:none;
+      display:flex;
+      gap:10px;
+      flex-direction:column;
+      align-items:center;
+      width:100%;
+      z-index:20;
+    }
+    .msg{
+      background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(255,255,255,0.92));
+      border:1px solid rgba(124,58,237,0.08);
+      color:var(--accent);
+      padding:12px 18px;
+      border-radius:999px;
+      font-weight:600;
+      box-shadow:0 8px 20px rgba(99,102,241,0.12);
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      transform-origin:center;
+      animation:pop 600ms cubic-bezier(.2,.9,.2,1);
+      pointer-events:auto;
+    }
+    @keyframes pop{
+      0%{ transform:translateY(8px) scale(.9); opacity:0; }
+      60%{ transform:translateY(-6px) scale(1.05); opacity:1; }
+      100%{ transform:translateY(0) scale(1); opacity:1; }
+    }
+
+    /* floating hearts/emotes */
+    .burst {
+      position:absolute;
+      left:50%;
+      top:50%;
+      pointer-events:none;
+      transform:translate(-50%,-50%);
+      overflow:visible;
+      width:0;height:0;
+      z-index:15;
+    }
+    .float {
+      position:absolute;
+      font-size:20px;
+      will-change:transform,opacity;
+      animation:rise 1800ms forwards cubic-bezier(.2,.8,.2,1);
+      filter:drop-shadow(0 6px 12px rgba(124,58,237,0.12));
+    }
+    @keyframes rise{
+      0%{ transform:translateY(6px) scale(.9) translateX(0); opacity:1; }
+      100%{ transform:translateY(-110px) scale(1.1) translateX(var(--tx,0)); opacity:0; }
+    }
+
+    /* little romantic underline */
+    .heart {
+      color:#ef4444;
+      margin-left:6px;
+      font-size:20px;
+      transform:translateY(2px);
+    }
+
+    /* responsive */
+    @media (max-width:420px){
+      .card{ padding:28px; }
+      .btn{ --sz:100px; font-size:16px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-label="Semangat untuk Caca">
+    <div class="message-belt" id="belt" aria-hidden="true"></div>
+
+    <h1>Semangat, Caca </h1>
+
+
+    <button class="btn" id="semangatBtn" aria-pressed="false" aria-label="Tombol Semangat">
+      Semangat
+    </button>
+
+
+
+    <div class="burst" id="burst" aria-hidden="true"></div>
+  </main>
+
+  <script>
+    (function(){
+      const messages = [
+        { text: " Semangat UTS nya Caca!",  },
+        { text: " Ayo Caca, pasti bisa!", },
+        { text: " Caca bantai kalkulus!", },
+        { text: " Kerja dulu, ngerayain nanti" },
+        { text: " Fokus sedikit lagi semangat ya, Caca!",}
+      ];
+
+      const btn = document.getElementById('semangatBtn');
+      const belt = document.getElementById('belt');
+      const burst = document.getElementById('burst');
+
+      function randInt(max){ return Math.floor(Math.random()*max); }
+      function pick(){
+        return messages[randInt(messages.length)];
+      }
+
+      function showMessage(msg){
+        const el = document.createElement('div');
+        el.className = 'msg';
+        el.setAttribute('role','status');
+        el.textContent = msg.text;
+        belt.appendChild(el);
+
+        // remove after 2.6s plus fade out
+        setTimeout(() => {
+          el.style.transition = 'opacity .45s, transform .45s';
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(-6px) scale(.96)';
+        }, 1800);
+        setTimeout(() => el.remove(), 2400);
+      }
+
+      function spawnFloat(content){
+        const el = document.createElement('div');
+        el.className = 'float';
+        el.textContent = content;
+        // randomize horizontal drift
+        const tx = (Math.random()*120 - 60) + 'px';
+        el.style.setProperty('--tx', tx);
+        // random start offset to avoid overlap
+        el.style.left = (50 + (Math.random()*30-15)) + '%';
+        el.style.top = (50 + (Math.random()*10-5)) + '%';
+        el.style.fontSize = (16 + Math.random()*14) + 'px';
+        burst.appendChild(el);
+        setTimeout(()=> el.remove(), 1900);
+      }
+
+      // small compound effect when clicked
+      btn.addEventListener('click', () => {
+        const msg = pick();
+        showMessage(msg);
+        // spawn a mix of emotes/hearts
+        const floats = [msg.style, '💗','✨','🎉','👏'];
+        for(let i=0;i<5;i++){
+          setTimeout(()=> spawnFloat(floats[randInt(floats.length)]), i*80);
+        }
+        // tiny pulse accessible cue
+        btn.setAttribute('aria-pressed','true');
+        setTimeout(()=> btn.setAttribute('aria-pressed','false'), 400);
+      });
+
+      // keyboard support: Enter/Space triggers click
+      btn.addEventListener('keydown', (e)=>{
+        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); btn.click(); }
+      });
+
+      // initial gentle auto message to welcome
+      setTimeout(()=> showMessage({ text: "Hai Caca — klik tombol semangatnya" }), 700);
+    })();
+  </script>
+</body>
+</html>
