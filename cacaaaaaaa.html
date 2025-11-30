@@ -138,7 +138,7 @@
 </head>
 <body>
   <main class="card" role="main" aria-label="Semangat untuk Caca">
-    <div class="message-belt" id="belt" aria-hidden="true"></div>
+    <div class="message-belt" id="belt" aria-hidden="false"></div>
 
     <h1>Semangat, Caca </h1>
 
@@ -155,11 +155,11 @@
   <script>
     (function(){
       const messages = [
-        { text: " Semangat UTS nya Caca!",  },
-        { text: " Ayo Caca, pasti bisa!", },
-        { text: " Caca bantai kalkulus!", },
-        { text: " Kerja dulu, ngerayain nanti" },
-        { text: " Fokus sedikit lagi semangat ya, Caca!",}
+        { text: "💪 Semangat UTS nya Caca!", style: "🌟" },
+        { text: "✨ Ayo Caca, pasti bisa!", style: "💫" },
+        { text: "🔥 Caca bantai kalkulus!", style: "📐" },
+        { text: "✨ Kerja dulu, ngerayain nanti", style: "✨" },
+        { text: "🎯 Fokus sedikit lagi, semangat ya, Caca!", style: "🏆" }
       ];
 
       const btn = document.getElementById('semangatBtn');
@@ -206,23 +206,23 @@
       btn.addEventListener('click', () => {
         const msg = pick();
         showMessage(msg);
-        // spawn a mix of emotes/hearts
-        const floats = [msg.style, '💗','✨','🎉','👏'];
+
+        // filter out falsy values to avoid showing "undefined"
+        const floats = [msg.style, '💗','✨','🎉','👏'].filter(Boolean);
         for(let i=0;i<5;i++){
           setTimeout(()=> spawnFloat(floats[randInt(floats.length)]), i*80);
         }
-        // tiny pulse accessible cue
         btn.setAttribute('aria-pressed','true');
         setTimeout(()=> btn.setAttribute('aria-pressed','false'), 400);
       });
 
       // keyboard support: Enter/Space triggers click
       btn.addEventListener('keydown', (e)=>{
-        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); btn.click(); }
+        if(e.key === 'Enter' || e.code === 'Space' || e.key === ' '){ e.preventDefault(); btn.click(); }
       });
 
       // initial gentle auto message to welcome
-      setTimeout(()=> showMessage({ text: "Hai Caca — klik tombol semangatnya" }), 700);
+      setTimeout(()=> showMessage({ text: "Hai Caca — klik tombol semangatnya 💖" }), 700);
     })();
   </script>
 </body>
